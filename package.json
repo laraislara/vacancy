@@ -1,9 +1,10 @@
 {
-  "name": "hhmap",
+  "name": "vacancy-app",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "react": "^16.2.0",
+    "react-autocomplete": "^1.8.1",
     "react-dom": "^16.2.0",
     "react-scripts": "1.1.1"
   },

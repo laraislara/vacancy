@@ -1,0 +1,46 @@
+h3 {
+    text-align: center;
+}
+
+input {
+    width: 500px;
+    height: 30px;
+    font-size: 15px;
+    border: none;
+    border-bottom: 1px solid black;
+    margin-left: 300px;
+}
+
+.searchButton {
+    height: 35px;
+    width: 65px;
+    border-radius: 10%;
+    background-color: blue;
+    color: white;
+    margin-left: 20px;
+}
+
+.searchButton:hover {
+    cursor: pointer;
+    border: 6px solid blue;
+}
+
+table {
+    margin: 0 auto;
+    margin-top: 30px;
+    border-collapse: collapse;
+}
+
+.header {
+    font-weight: bold;
+    text-align: center;
+}
+
+td {
+    border: 1px solid black;
+    line-height: 1.5em;
+}
+
+a {
+    text-decoration: none;
+}
