@@ -3,8 +3,6 @@ import './App.css'
 import Autocomplete from 'react-autocomplete'
 import { YMaps, Map, ObjectManager, Button } from 'react-yandex-maps'
 
-const API_HH_URL = 'https://api.hh.ru/'
-
 const VacanciesTable = ({vacancies, isLoading}) => {
   const vacanciesRow = vacancies.map(vacancy => (
       <tr key={vacancy.id}>
@@ -83,6 +81,8 @@ const PlacemarkMap = ({vacancies}) => {
   )
 }
 
+const API_HH_URL = 'https://api.hh.ru/'
+
 class App extends Component {
   state = {
     vacancies: [],
@@ -142,7 +142,7 @@ class App extends Component {
     const metroQuery = filteredMetro.length > 0
       ? `&metro=${filteredMetro.shift().id}`
       : ''
-    const vacanciesUrl = `${API_HH_URL}vacancies?area=1&text=${vacancyValue}${metroQuery}`
+    const vacanciesUrl = `${API_HH_URL}vacancies?area=1&per_page=100&text=${vacancyValue}${metroQuery}`
     this.setState({isLoading: true})
     fetch(vacanciesUrl)
       .then(response => response.json())
