@@ -32,19 +32,13 @@ const VacanciesTable = ({vacancies, isLoading}) => {
   )
 }
 
-
-/*const ymapData = data.items
-  .filter( item => {
-    return item.address != null && item.address.lat != null && item.address.lng != null
-  })
-  .map(item => {
-    return (*/
-
-//
-
-const PlacemarkMap = (vacancies) => {
+const PlacemarkMap = ({vacancies}) => {
   const mapState = { center: [55.76, 37.64], zoom: 12 }
-  const ymapData = vacancies.map(vacancy => {
+  const mapData = vacancies
+    .filter( vacancy => {
+    return vacancy.address != null && vacancy.address.lat != null && vacancy.address.lng != null
+  })
+    .map(vacancy => {
     return (
       {
         type: "Feature",
@@ -55,7 +49,7 @@ const PlacemarkMap = (vacancies) => {
         },
         properties:{
           balloonContentHeader: vacancy.name,
-          balloonContentBody:"<a href="+vacancy.alternate_url+" target=_blank>"+vacancy.name+"</a>",
+          balloonContentBody:"<a href="+vacancy.alternate_url+" target=_blank>"+vacancy.employer.name+"</a>",
           balloonContentFooter:(vacancy.salary != null && vacancy.salary.from != null &&  "от "+vacancy.salary.from ) || "Не указана" ,
           clusterCaption: vacancy.name,
           hintContent: vacancy.name
@@ -69,8 +63,8 @@ const PlacemarkMap = (vacancies) => {
   })
   return (
     <YMaps>
-      <Map state={mapState} width={'100%'} height={500}>
-        <Button data={{ content: "Количество ваканский на карте " + ymapData.length }} options={{ float: 'right', maxWidth: '100%' }} />
+      <Map state={mapState} width={'99%'} height={500}>
+        <Button data={{ content: "Количество ваканский на карте " + mapData.length }} options={{ float: 'right', maxWidth: '100%' }} />
         <ObjectManager
           options={{
             clusterize: true,
@@ -82,7 +76,7 @@ const PlacemarkMap = (vacancies) => {
           clusters={{
             preset: 'islands#blueClusterIcons',
           }}
-          features={ymapData}
+          features={mapData}
         />
       </Map>
     </YMaps>
@@ -175,6 +169,7 @@ class App extends Component {
           onChange={(event, value) => this.setState({ vacancyValue: value })}
           onSelect={value => this.setState({ vacancyValue: value })}
           renderInput={(props) => <input id='inputVacancy' placeholder='Выберите должность...' {...props} />}
+          wrapperStyle={{ position: 'relative', display: 'inline-block', zIndex: '9999' }}
         />
         <Autocomplete
           getItemValue={(item) => item.label}
@@ -191,8 +186,10 @@ class App extends Component {
           onChange={(event, value) => this.setState({ metroValue: value })}
           onSelect={value => this.setState({ metroValue: value })}
           renderInput={(props) => <input id='inputMetro' placeholder='Выберите станцию...' {...props} />}
+          wrapperStyle={{ position: 'relative', display: 'inline-block', zIndex: '9999' }}
         />
         <button onClick={this.handleSubmit} className='searchButton'>Поиск</button>
+        <PlacemarkMap vacancies={this.state.vacancies}/>
         <div>
           {
             this.state.vacancies.length > 0
@@ -201,7 +198,6 @@ class App extends Component {
               isLoading={this.state.isLoading}/>
           }
         </div>
-     <PlacemarkMap vacancies={this.state.vacancies}/>
       </div>
     )
   }

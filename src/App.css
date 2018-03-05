@@ -23,12 +23,13 @@ h3 {
 }
 
 .searchButton {
-    height: 40px;
+    height: 35px;
     width: 70px;
     border-radius: 5px;
     background-color: blue;
     color: white;
     margin-left: 20px;
+    margin-bottom: 10px;
 }
 
 .searchButton:hover {
@@ -37,6 +38,7 @@ h3 {
 }
 
 table {
+    width: 80%;
     margin: 0 auto;
     margin-top: 30px;
     border-collapse: collapse;
@@ -45,18 +47,21 @@ table {
 .header {
     font-weight: bold;
     text-align: center;
+    background-color: #e9e9e9;
 }
 
 td {
-    border: 1px solid black;
+   /* border: 0.5px solid gray;*/
     line-height: 1.5em;
+    padding: 10px;
 }
 
 a {
     text-decoration: none;
+    color: #4d4d4d;
 }
 
-#map {
-    width: 100%;
-    height: 85%;
+a:hover {
+    text-decoration: underline;
 }
+
