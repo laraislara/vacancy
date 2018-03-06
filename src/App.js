@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import './App.css'
 import Autocomplete from 'react-autocomplete'
-
-const API_HH_URL = 'https://api.hh.ru/'
+import { YMaps, Map, ObjectManager, Button } from 'react-yandex-maps'
 
 const VacanciesTable = ({vacancies, isLoading}) => {
   const vacanciesRow = vacancies.map(vacancy => (
@@ -10,7 +9,7 @@ const VacanciesTable = ({vacancies, isLoading}) => {
         <td><a href={vacancy.alternate_url}>{vacancy.name.slice(0,50)}</a></td>
         <td>{vacancy.employer.name}</td>
         <td>{new Date(vacancy.published_at).toLocaleString('ru', {year: 'numeric', month: 'numeric', day: 'numeric'})}</td>
-        <td>{vacancy.salary !== null && (`${vacancy.salary.from} ${vacancy.salary.currency}`)}</td>
+        <td>{vacancy.salary !== null ? (`${vacancy.salary.from} ${vacancy.salary.currency}`) : 'Не указана'}</td>
       </tr>
     ),
   )
@@ -21,7 +20,7 @@ const VacanciesTable = ({vacancies, isLoading}) => {
         <td>Должность</td>
         <td>Компания</td>
         <td>Дата</td>
-        <td>Оклад</td>
+        <td>Заработная плата</td>
       </tr>
       </thead>
       <tbody>
@@ -30,6 +29,59 @@ const VacanciesTable = ({vacancies, isLoading}) => {
     </table>
   )
 }
+
+const PlacemarkMap = ({vacancies}) => {
+  const mapState = { center: [55.76, 37.64], zoom: 12 }
+  const mapData = vacancies
+    .filter( vacancy => {
+    return vacancy.address != null && vacancy.address.lat != null && vacancy.address.lng != null
+  })
+    .map(vacancy => {
+    return (
+      {
+        type: "Feature",
+        id: vacancy.id,
+        geometry: {
+          type: "Point",
+          coordinates: [vacancy.address.lat, vacancy.address.lng]
+        },
+        properties:{
+          balloonContentHeader: vacancy.name,
+          balloonContentBody:"<a href="+vacancy.alternate_url+" target=_blank>"+vacancy.employer.name+"</a>",
+          balloonContentFooter:(vacancy.salary != null && vacancy.salary.from != null &&  "от "+vacancy.salary.from ) || "Не указана" ,
+          clusterCaption: vacancy.name,
+          hintContent: vacancy.name
+        },
+        options: {
+          preset: "islands#blueCircleDotIconWithCaption",
+          iconCaptionMaxWidth: "100"
+        }
+      }
+    )
+  })
+  return (
+    <YMaps>
+      <Map state={mapState} width={'99%'} height={500}>
+        <Button data={{ content: "Количество ваканский на карте " + mapData.length }} options={{ float: 'right', maxWidth: '100%' }} />
+        <ObjectManager
+          options={{
+            clusterize: true,
+            gridSize: 32,
+          }}
+          objects={{
+            preset: 'islands#blueDotIcon',
+          }}
+          clusters={{
+            preset: 'islands#blueClusterIcons',
+          }}
+          features={mapData}
+        />
+      </Map>
+    </YMaps>
+  )
+}
+
+const API_HH_URL = 'https://api.hh.ru/'
 
 class App extends Component {
   state = {
@@ -90,7 +142,7 @@ class App extends Component {
     const metroQuery = filteredMetro.length > 0
       ? `&metro=${filteredMetro.shift().id}`
       : ''
-    const vacanciesUrl = `${API_HH_URL}vacancies?area=1&text=${vacancyValue}${metroQuery}`
+    const vacanciesUrl = `${API_HH_URL}vacancies?area=1&per_page=100&text=${vacancyValue}${metroQuery}`
     this.setState({isLoading: true})
     fetch(vacanciesUrl)
       .then(response => response.json())
@@ -116,7 +168,8 @@ class App extends Component {
           value={this.state.vacancyValue}
           onChange={(event, value) => this.setState({ vacancyValue: value })}
           onSelect={value => this.setState({ vacancyValue: value })}
-          renderInput={(props) => <input id='inputVacancy' {...props} />}
+          renderInput={(props) => <input id='inputVacancy' placeholder='Выберите должность...' {...props} />}
+          wrapperStyle={{ position: 'relative', display: 'inline-block', zIndex: '9999' }}
         />
         <Autocomplete
           getItemValue={(item) => item.label}
@@ -132,8 +185,11 @@ class App extends Component {
           value={this.state.metroValue}
           onChange={(event, value) => this.setState({ metroValue: value })}
           onSelect={value => this.setState({ metroValue: value })}
+          renderInput={(props) => <input id='inputMetro' placeholder='Выберите станцию...' {...props} />}
+          wrapperStyle={{ position: 'relative', display: 'inline-block', zIndex: '9999' }}
         />
         <button onClick={this.handleSubmit} className='searchButton'>Поиск</button>
+        <PlacemarkMap vacancies={this.state.vacancies}/>
         <div>
           {
             this.state.vacancies.length > 0
@@ -143,7 +199,7 @@ class App extends Component {
           }
         </div>
       </div>
-    );
+    )
   }
 }
 
